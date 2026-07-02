@@ -1,4 +1,5 @@
 # 📈 Personal Trading Journal
+<img width="1805" height="758" alt="image" src="https://github.com/user-attachments/assets/7dab8cd4-8c42-426b-b27d-0b8b5f09ded3" />
 
 A lightweight personal trading journal built with HTML, Node.js, and Express. Trade entries are saved to and read from a local `trades.txt` file — no database required.
 
