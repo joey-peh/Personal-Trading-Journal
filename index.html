@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Trading Journal</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f0f2f7;
+    color: #1a1d27;
+    min-height: 100vh;
+  }
+
+  header {
+    background: #ffffff;
+    border-bottom: 1px solid #e2e5ef;
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  header h1 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #1a1d27;
+  }
+
+  header span { font-size: 1.5rem; }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 20px;
+  }
+
+  /* Stats Bar */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .stat-card {
+    background: #ffffff;
+    border: 1px solid #e2e5ef;
+    border-radius: 10px;
+    padding: 16px 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .stat-card .label {
+    font-size: 0.75rem;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+
+  .stat-card .value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1d27;
+  }
+
+  .stat-card .value.green { color: #16a34a; }
+  .stat-card .value.red   { color: #dc2626; }
+
+  /* Form */
+  .form-card {
+    background: #ffffff;
+    border: 1px solid #e2e5ef;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 32px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .form-card h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .form-group.full-width { grid-column: 1 / -1; }
+
+  label {
+    font-size: 0.8rem;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  input, select, textarea {
+    background: #f8f9fc;
+    border: 1px solid #e2e5ef;
+    border-radius: 8px;
+    color: #1a1d27;
+    padding: 10px 12px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #6366f1;
+    background: #fff;
+  }
+
+  textarea { resize: vertical; min-height: 80px; }
+
+  .btn-submit {
+    margin-top: 18px;
+    background: #6366f1;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 28px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-submit:hover { background: #4f46e5; }
+
+  /* Filters */
+  .filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .filters input, .filters select {
+    width: auto;
+    flex: 1;
+    min-width: 140px;
+  }
+
+  .filters label {
+    white-space: nowrap;
+    align-self: center;
+  }
+
+  /* Table */
+  .table-wrapper {
+    background: #ffffff;
+    border: 1px solid #e2e5ef;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .table-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e2e5ef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .table-header h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+
+  thead th {
+    background: #f8f9fc;
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 0.75rem;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #e2e5ef;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #f0f2f7;
+    transition: background 0.15s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #f8f9fc; }
+
+  td {
+    padding: 13px 16px;
+    vertical-align: middle;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .badge.long  { background: #dcfce7; color: #16a34a; }
+  .badge.short { background: #fee2e2; color: #dc2626; }
+
+  .pnl.positive { color: #16a34a; font-weight: 600; }
+  .pnl.negative { color: #dc2626; font-weight: 600; }
+  .pnl.zero     { color: #aaa; }
+
+  .btn-delete {
+    background: transparent;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-delete:hover { background: #fee2e2; }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: #bbb;
+  }
+
+  .empty-state .icon { font-size: 2.5rem; margin-bottom: 10px; }
+
+  .notes-cell {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #aaa;
+    font-size: 0.82rem;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #16a34a;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s;
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .toast.error { background: #dc2626; }
+</style>
+</head>
+<body>
+
+<header>
+  <span>📈</span>
+  <h1>Personal Trading Journal</h1>
+</header>
+
+<div class="container">
+
+  <!-- Stats -->
+  <div class="stats" id="stats">
+    <div class="stat-card">
+      <div class="label">Total Trades</div>
+      <div class="value" id="stat-total">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Win Rate</div>
+      <div class="value" id="stat-winrate">0%</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Total P&L</div>
+      <div class="value" id="stat-pnl">$0.00</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Best Trade</div>
+      <div class="value green" id="stat-best">$0.00</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Worst Trade</div>
+      <div class="value red" id="stat-worst">$0.00</div>
+    </div>
+  </div>
+
+  <!-- Entry Form -->
+  <div class="form-card">
+    <h2>Log New Trade</h2>
+    <form id="tradeForm">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="date">Date</label>
+          <input type="date" id="date" required />
+        </div>
+        <div class="form-group">
+          <label for="symbol">Symbol / Ticker</label>
+          <input type="text" id="symbol" placeholder="e.g. AAPL, BTC" required />
+        </div>
+        <div class="form-group">
+          <label for="direction">Direction</label>
+          <select id="direction">
+            <option value="Long">Long</option>
+            <option value="Short">Short</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="entryPrice">Entry Price</label>
+          <input type="number" id="entryPrice" placeholder="0.00" step="0.0001" required />
+        </div>
+        <div class="form-group">
+          <label for="exitPrice">Exit Price</label>
+          <input type="number" id="exitPrice" placeholder="0.00" step="0.0001" required />
+        </div>
+        <div class="form-group">
+          <label for="quantity">Quantity / Lots</label>
+          <input type="number" id="quantity" placeholder="1" step="0.0001" required />
+        </div>
+        <div class="form-group">
+          <label for="strategy">Strategy</label>
+          <input type="text" id="strategy" placeholder="e.g. Breakout, Scalp" />
+        </div>
+        <div class="form-group">
+          <label for="outcome">Outcome</label>
+          <select id="outcome">
+            <option value="Win">Win</option>
+            <option value="Loss">Loss</option>
+            <option value="Breakeven">Breakeven</option>
+          </select>
+        </div>
+        <div class="form-group full-width">
+          <label for="notes">Notes / Reflection</label>
+          <textarea id="notes" placeholder="What went well? What could be improved?"></textarea>
+        </div>
+      </div>
+      <button type="submit" class="btn-submit">+ Log Trade</button>
+    </form>
+  </div>
+
+  <!-- Trade Log Table -->
+  <div class="filters">
+    <label>Filter:</label>
+    <input type="text" id="filterSymbol" placeholder="Symbol..." />
+    <select id="filterDirection">
+      <option value="">All Directions</option>
+      <option value="Long">Long</option>
+      <option value="Short">Short</option>
+    </select>
+    <select id="filterOutcome">
+      <option value="">All Outcomes</option>
+      <option value="Win">Win</option>
+      <option value="Loss">Loss</option>
+      <option value="Breakeven">Breakeven</option>
+    </select>
+  </div>
+
+  <div class="table-wrapper">
+    <div class="table-header">
+      <h2>Trade Log</h2>
+      <span id="trade-count" style="color:#555; font-size:0.85rem;"></span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Symbol</th>
+          <th>Direction</th>
+          <th>Entry</th>
+          <th>Exit</th>
+          <th>Qty</th>
+          <th>P&L</th>
+          <th>Outcome</th>
+          <th>Strategy</th>
+          <th>Notes</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="tradeTableBody"></tbody>
+    </table>
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <div class="icon">📋</div>
+      <div>No trades logged yet. Add your first trade above.</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let allTrades = [];
+
+  // Set today's date as default
+  document.getElementById('date').valueAsDate = new Date();
+
+  async function loadTrades() {
+    const res = await fetch('/api/trades');
+    allTrades = await res.json();
+    renderTable(allTrades);
+    renderStats(allTrades);
+  }
+
+  function calcPnL(trade) {
+    const entry = parseFloat(trade.entryPrice);
+    const exit  = parseFloat(trade.exitPrice);
+    const qty   = parseFloat(trade.quantity);
+    if (trade.direction === 'Long') return (exit - entry) * qty;
+    return (entry - exit) * qty;
+  }
+
+  function renderStats(trades) {
+    const total = trades.length;
+    const wins  = trades.filter(t => t.outcome === 'Win').length;
+    const winRate = total ? ((wins / total) * 100).toFixed(1) + '%' : '0%';
+    const pnls  = trades.map(calcPnL);
+    const totalPnL = pnls.reduce((a, b) => a + b, 0);
+    const best  = pnls.length ? Math.max(...pnls) : 0;
+    const worst = pnls.length ? Math.min(...pnls) : 0;
+
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-winrate').textContent = winRate;
+
+    const pnlEl = document.getElementById('stat-pnl');
+    pnlEl.textContent = formatPnL(totalPnL);
+    pnlEl.className = 'value ' + (totalPnL > 0 ? 'green' : totalPnL < 0 ? 'red' : '');
+
+    document.getElementById('stat-best').textContent  = formatPnL(best);
+    document.getElementById('stat-worst').textContent = formatPnL(worst);
+  }
+
+  function formatPnL(val) {
+    const sign = val >= 0 ? '+' : '';
+    return sign + '$' + val.toFixed(2);
+  }
+
+  function renderTable(trades) {
+    const tbody = document.getElementById('tradeTableBody');
+    const empty = document.getElementById('emptyState');
+    const count = document.getElementById('trade-count');
+
+    tbody.innerHTML = '';
+
+    if (trades.length === 0) {
+      empty.style.display = 'block';
+      count.textContent = '';
+      return;
+    }
+
+    empty.style.display = 'none';
+    count.textContent = trades.length + ' trade' + (trades.length !== 1 ? 's' : '');
+
+    // Show newest first
+    [...trades].reverse().forEach(trade => {
+      const pnl = calcPnL(trade);
+      const pnlClass = pnl > 0 ? 'positive' : pnl < 0 ? 'negative' : 'zero';
+      const dirClass = trade.direction === 'Long' ? 'long' : 'short';
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${trade.date}</td>
+        <td><strong>${trade.symbol.toUpperCase()}</strong></td>
+        <td><span class="badge ${dirClass}">${trade.direction}</span></td>
+        <td>$${parseFloat(trade.entryPrice).toFixed(4)}</td>
+        <td>$${parseFloat(trade.exitPrice).toFixed(4)}</td>
+        <td>${trade.quantity}</td>
+        <td class="pnl ${pnlClass}">${formatPnL(pnl)}</td>
+        <td>${trade.outcome}</td>
+        <td>${trade.strategy || '—'}</td>
+        <td class="notes-cell" title="${trade.notes || ''}">${trade.notes || '—'}</td>
+        <td><button class="btn-delete" onclick="deleteTrade(${trade.id})">Delete</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  async function deleteTrade(id) {
+    if (!confirm('Delete this trade entry?')) return;
+    await fetch(`/api/trades/${id}`, { method: 'DELETE' });
+    showToast('Trade deleted.', true);
+    loadTrades();
+  }
+
+  document.getElementById('tradeForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const trade = {
+      date:       document.getElementById('date').value,
+      symbol:     document.getElementById('symbol').value.trim(),
+      direction:  document.getElementById('direction').value,
+      entryPrice: document.getElementById('entryPrice').value,
+      exitPrice:  document.getElementById('exitPrice').value,
+      quantity:   document.getElementById('quantity').value,
+      strategy:   document.getElementById('strategy').value.trim(),
+      outcome:    document.getElementById('outcome').value,
+      notes:      document.getElementById('notes').value.trim(),
+    };
+
+    await fetch('/api/trades', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(trade)
+    });
+
+    e.target.reset();
+    document.getElementById('date').valueAsDate = new Date();
+    showToast('Trade logged successfully!');
+    loadTrades();
+  });
+
+  // Filters
+  ['filterSymbol', 'filterDirection', 'filterOutcome'].forEach(id => {
+    document.getElementById(id).addEventListener('input', applyFilters);
+  });
+
+  function applyFilters() {
+    const sym = document.getElementById('filterSymbol').value.toLowerCase();
+    const dir = document.getElementById('filterDirection').value;
+    const out = document.getElementById('filterOutcome').value;
+
+    const filtered = allTrades.filter(t => {
+      return (!sym || t.symbol.toLowerCase().includes(sym))
+          && (!dir || t.direction === dir)
+          && (!out || t.outcome === out);
+    });
+
+    renderTable(filtered);
+  }
+
+  function showToast(msg, isError = false) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.className = 'toast show' + (isError ? ' error' : '');
+    setTimeout(() => toast.className = 'toast', 2500);
+  }
+
+  loadTrades();
+</script>
+</body>
+</html>
