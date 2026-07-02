@@ -7,6 +7,8 @@ A lightweight personal trading journal built with HTML, Node.js, and Express. Tr
 ![HTML](https://img.shields.io/badge/Frontend-HTML%2FCSS%2FJS-E34F26?style=flat&logo=html5&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-blue?style=flat)
 
+---
+
 ## ✨ Features
 
 | Feature | Description |
@@ -17,35 +19,54 @@ A lightweight personal trading journal built with HTML, Node.js, and Express. Tr
 | 🔍 Filtering | Filter trade log by symbol, direction, and outcome |
 | 💾 Flat File Storage | All entries persisted locally to `trades.txt` — no database needed |
 
+---
+
 ## 🛠️ Prerequisites
+
+Make sure you have the following installed before you begin:
 
 - [Node.js](https://nodejs.org/) v14 or higher
 - npm (comes bundled with Node.js)
 
-## 🚀 Setup & Run
+You can verify your installation by running:
 
-**1. Initialise the project**
+```bash
+node -v
+npm -v
+```
 
-​```bash
-mkdir trading-journal && cd trading-journal
-npm init -y
-npm install express
-mkdir public
-​```
+---
 
-**2. Place the files** as shown in the file structure above.
+## 🚀 Getting Started
+
+**1. Clone the repository**
+
+```bash
+git clone https://github.com/your-username/trading-journal.git
+cd trading-journal
+```
+
+**2. Install dependencies**
+
+```bash
+npm install
+```
 
 **3. Start the server**
 
-​```bash
+```bash
 node server.js
-​```
+```
 
-**4. Open your browser**
+**4. Open your browser and navigate to:**
 
-​```
+```
 http://localhost:3000
-​```
+```
+
+You should see the trading journal dashboard up and running. 🎉
+
+---
 
 ## ⚙️ How It Works
 
@@ -59,6 +80,8 @@ Each trade entry is stored as a single JSON line in `trades.txt`. The backend ex
 
 The frontend fetches from these endpoints and renders the trade log dynamically in the browser without any page reloads.
 
+---
+
 ## 🧱 Tech Stack
 
 | Layer | Technology |
@@ -66,6 +89,14 @@ The frontend fetches from these endpoints and renders the trade log dynamically 
 | Frontend | HTML, CSS, Vanilla JS |
 | Backend | Node.js, Express |
 | Storage | Flat file (`.txt`) |
+
+---
+
+## 🛑 Stopping the Server
+
+To stop the server at any time, press `Ctrl + C` in your terminal.
+
+---
 
 ## 📄 License
 
